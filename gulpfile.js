@@ -1,36 +1,40 @@
-var gulp = require('gulp'),
-    sass = require('gulp-sass'),
-    server = require('browser-sync'),
-    prefix = require('gulp-autoprefixer'),
-    minify = require('gulp-csso'),
-    rename = require('gulp-rename');
+"use strict";
 
+const 	{src, dest, parallel} = require('gulp');
+const	gulp = require('gulp');
+const  	sass = require('gulp-sass');
+const   server = require('browser-sync');
+const	prefix = require('gulp-autoprefixer');
+const   minify = require('gulp-csso');
+const	rename = require('gulp-rename');
 
-gulp.task('sass', function(){
-    return gulp.src(['sass/**/*.sass', 'sass/**/*.scss'])
+function css(){
+    return src(['sass/**/*.sass', 'sass/**/*.scss'])
     .pipe(sass({outputStyle: 'expanded'}).on('error', sass.logError))
     .pipe(prefix(['last 12 versions','> 1%','ie 8'], {cascade: true}))
-    .pipe(gulp.dest('css/'));
-});
+    .pipe(dest('css/'));
+}
 
-gulp.task('server', function(){
+function startServer(){
 	server.init({
 		server: ""
 	});
-});
+}
 
-gulp.task('build', function(){
-	return gulp.src(['css/*.css'])
+function build(){
+	return src(['css/*.css'])
 	.pipe(minify())
-  .pipe(rename({
-    suffix: ".min"
-  }))
-	.pipe(gulp.dest('css/'));
-});
+  	.pipe(rename({
+    	suffix: ".min"
+  	}))
+	.pipe(dest('css/'));
+}
 
-gulp.task('watch', function(){
-    gulp.watch(['sass/**/*.sass', 'sass/**/*.scss'], ['sass']);
-});
+function watchFiles(){
+    gulp.watch(['sass/**/*.sass', 'sass/**/*.scss'], css);
+}
 
+const watch = parallel(startServer, watchFiles);
 
-gulp.task('default', ['server','watch']);
+exports.default = watch;
+exports.start = startServer;
